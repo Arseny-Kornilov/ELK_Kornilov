@@ -15,3 +15,4 @@
 
 ### Задание 3.Logstash
 Установите и запустите Logstash и Nginx. С помощью Logstash отправьте access-лог Nginx в Elasticsearch.
+<img width="1300" height="558" alt="image" src="https://github.com/user-attachments/assets/39cd62bb-6694-4b56-8301-5feab060206f" />
