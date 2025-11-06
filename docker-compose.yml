@@ -1,6 +1,20 @@
 version: '3.7'
 
 services:
+  fluentbeat:
+    image: fluent/fluent-bit:latest
+    container_name: fluentbeat
+    command: /fluent-bit/bin/fluent-bit -c /fluent-bit/etc/fluent-bit.conf
+    user: root
+    volumes:
+      - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - /var/log/nginx:/var/log/nginx:ro
+    networks:
+      - elk-network
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
   elasticsearch:
     image: elasticsearch:7.17.0
     volumes:
@@ -15,23 +29,6 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
-
-  logstash:
-    image: logstash:7.17.0
-    volumes:
-      - ./configs/logstash/config.yml:/usr/share/logstash/config/logstash.yml:ro
-      - ./configs/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro
-      - ./configs/logstash/pipelines:/usr/share/logstash/config/pipelines:ro
-    environment:
-      LS_JAVA_OPTS: "-Xmx512m -Xms512m"
-    ports:
-      - "5044:5044"
-      - "5001:5000"
-      - "9600:9600"
-    networks:
-      - elk
-    depends_on:
-      - elasticsearch
 
   kibana:
     image: kibana:7.17.0
