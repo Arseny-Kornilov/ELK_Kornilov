@@ -1,23 +1,27 @@
-filebeat.inputs:
-  - type: log
-    enabled: true
-    # Я запущу filebeat в докере и проброшу логи приложения по данному пути
-    paths:
-      - /host_metrics_app/host_metrics_app.log
-    # В fields мы можем указать дополнительные поля, а затем в logstash вытаскивать их
-    # и делать какую-нибудь дополнительную работу с логами
-    fields:
-      # Название нашего сервиса
-      service: host_metrics_app
+[SERVICE]
+    Daemon       off
+    Log_Level    info
+    Parsers_File parsers.conf
 
-  - type: log
-    enabled: true
-    paths:
-      - /log_gen/log_gen.log
+[INPUT]
+    Name        tail
+    Path        /var/log/nginx/*.log
+    Tag         nginx
+    Skip_Long_Lines On
+    Refresh_Interval 5
 
-    fields:
-      service: log_gen
-      organisation: netology
+[OUTPUT]
+    Name        es
+    Match       *
+    Host        elasticsearch
+    Port        9200
+    Index       nginx-logs
+    Suppress_Type_Name On
+    Generate_ID On
 
-output.logstash:
-  hosts: ["logstash:5044"]
+[OUTPUT]
+    Name        stdout
+    Match       *
+    Format      json
+
+
